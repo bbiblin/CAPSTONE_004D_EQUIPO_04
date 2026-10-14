@@ -1,0 +1,510 @@
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import MapView from '@/components/map/MapView';
+import { PlaceSearchInput } from '@/components/map/PlaceSearchInput';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import Select from '@/components/ui/Select';
+import { Input, Textarea } from '@/components/ui/Input';
+import Alert from '@/components/ui/Alert';
+import SeveritySelector from '@/components/reports/SeveritySelector';
+import EvidenceUploader from '@/components/reports/EvidenceUploader';
+import Icon from '@/components/ui/Icon';
+import BackButton from '@/components/ui/BackButton';
+import { useGeolocation } from '@/hooks/useGeolocation';
+import { createIncident, findNearbyIncidents, reverseGeocode, voteOnIncident } from '@/lib/supabase';
+import { processImage } from '@/lib/imageCompression';
+import { moderateImage } from '@/lib/imageModeration';
+import { sanitizeDescription } from '@/lib/textFilter';
+import { INCIDENT_CATEGORIES, DURATION_OPTIONS, DESCRIPTION_MAX_LENGTH, CENTER } from '@/lib/constants';
+import { hasPhotoConsent } from '@/lib/utils';
+import TermsGate from '@/components/terms/TermsGate';
+import type { Profile, NearbyIncident } from '@/types';
+
+interface ReportPageProps {
+  profile: Profile;
+  onConsentAccepted?: () => void;
+}
+
+function ReportPage({ profile, onConsentAccepted }: ReportPageProps) {
+  const [category, setCategory] = useState('');
+  const [description, setDescription] = useState('');
+  const [severity, setSeverity] = useState<number | null>(null);
+  const [observedAt, setObservedAt] = useState('');
+  const [estimatedDuration, setEstimatedDuration] = useState('');
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
+  const [image, setImage] = useState<File | null>(null);
+  const [imageError, setImageError] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [gpsError, setGpsError] = useState<string | null>(null);
+  const [locationMethod, setLocationMethod] = useState<'none' | 'gps' | 'map'>('none');
+  const [isMapFullscreen, setIsMapFullscreen] = useState(false);
+  const [placeName, setPlaceName] = useState<string | null>(null);
+  const [address, setAddress] = useState<string | null>(null);
+  const [geo, setGeo] = useState<{
+    country: string | null;
+    region: string | null;
+    province: string | null;
+    comuna: string | null;
+    neighbourhood: string | null;
+    street: string | null;
+    house_number: string | null;
+  }>({ country: null, region: null, province: null, comuna: null, neighbourhood: null, street: null, house_number: null });
+  const [nearbyIncidents, setNearbyIncidents] = useState<NearbyIncident[]>([]);
+  const [nearbyLoading, setNearbyLoading] = useState(false);
+  const [nearbyDismissed, setNearbyDismissed] = useState(false);
+  const [searchFocus, setSearchFocus] = useState<{ lat: number; lng: number; zoom?: number } | null>(null);
+  const navigate = useNavigate();
+
+  const {
+    latitude: gpsLat,
+    longitude: gpsLon,
+    loading: gpsLoading,
+    error: gpsHookError,
+    getCurrentPosition,
+  } = useGeolocation({ enableWatch: false });
+
+  useEffect(() => {
+    if (gpsHookError) setGpsError(gpsHookError);
+  }, [gpsHookError]);
+
+  useEffect(() => {
+    if (gpsLat !== null && gpsLon !== null && latitude === null) {
+      setLatitude(gpsLat);
+      setLongitude(gpsLon);
+      setGpsError(null);
+    }
+  }, [gpsLat, gpsLon, latitude]);
+
+  const mapCenter: [number, number] = (latitude && longitude) ? [latitude, longitude] : CENTER;
+
+  useEffect(() => {
+    if (latitude === null || longitude === null) return;
+    let active = true;
+    const timer = setTimeout(async () => {
+      const place = await reverseGeocode(latitude, longitude);
+      if (!active) return;
+      setPlaceName(place.place_name);
+      setAddress(place.address);
+      setGeo({
+        country: place.country,
+        region: place.region,
+        province: place.province,
+        comuna: place.comuna,
+        neighbourhood: place.neighbourhood,
+        street: place.street,
+        house_number: place.house_number,
+      });
+    }, 400);
+    return () => { active = false; clearTimeout(timer); };
+  }, [latitude, longitude]);
+
+  useEffect(() => {
+    if (latitude === null || longitude === null || !category) return;
+    if (nearbyDismissed) return;
+    let active = true;
+    setNearbyLoading(true);
+    const timer = setTimeout(async () => {
+      const { data } = await findNearbyIncidents(latitude, longitude, category, 100);
+      if (active) setNearbyIncidents(data || []);
+      if (active) setNearbyLoading(false);
+    }, 350);
+    return () => { active = false; clearTimeout(timer); };
+  }, [latitude, longitude, category, nearbyDismissed]);
+
+  const handleConfirmNearby = async (incident: NearbyIncident) => {
+    if (profile) {
+      await voteOnIncident(incident.id, 'up');
+    }
+    navigate(`/incident/${incident.id}`);
+  };
+
+  useEffect(() => {
+    setNearbyDismissed(false);
+    setNearbyIncidents([]);
+  }, [latitude, longitude, category]);
+
+  const handleLocationSelect = (lat: number, lng: number) => {
+    setLatitude(lat);
+    setLongitude(lng);
+    setLocationMethod('map');
+    setGpsError(null);
+    if (isMapFullscreen) setIsMapFullscreen(false);
+  };
+
+  const handlePlaceSelect = (lat: number, lng: number, displayName: string) => {
+    handleLocationSelect(lat, lng);
+    setSearchFocus({ lat, lng, zoom: 16 });
+  };
+
+  const handleUseGpsLocation = async () => {
+    setLocationMethod('gps');
+    await getCurrentPosition();
+  };
+
+  const handleUseMapSelection = () => {
+    setLocationMethod('map');
+    setIsMapFullscreen(true);
+  };
+
+  const handleImageChange = async (file: File) => {
+    const result = await processImage(file);
+    if (result.error || !result.file) {
+      setImageError(result.error || 'No se pudo procesar la imagen');
+      return;
+    }
+    const moderation = await moderateImage(result.file);
+    if (moderation.blocked) {
+      setImageError('La imagen es inapropiada y no puede usarse como evidencia. Intenta con otra foto.');
+      setImage(null);
+      return;
+    }
+    setImageError('');
+    setImage(result.file);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (!category || !description || severity === null || !observedAt || !estimatedDuration || latitude === null || longitude === null) {
+      setError('Todos los campos son obligatorios');
+      return;
+    }
+    if (description.length > DESCRIPTION_MAX_LENGTH) {
+      setError(`La descripción no puede superar los ${DESCRIPTION_MAX_LENGTH} caracteres`);
+      return;
+    }
+
+    if (image && !hasPhotoConsent(profile)) {
+      setError('Para adjuntar fotografías debes aceptar el consentimiento de uso de imágenes en los Términos y Condiciones.');
+      return;
+    }
+
+    const sanitized = sanitizeDescription(description);
+    const cleanDescription = sanitized.text;
+    if (sanitized.replaced) {
+      setDescription(cleanDescription);
+    }
+
+    setLoading(true);
+
+    const { data: incidentData, error } = await createIncident({
+      category,
+      description: cleanDescription,
+      severity,
+      observed_at: observedAt,
+      estimated_duration: estimatedDuration,
+      latitude,
+      longitude,
+      image: image || undefined,
+      created_by: profile.id,
+      place_name: placeName,
+      address,
+      country: geo.country,
+      region: geo.region,
+      province: geo.province,
+      comuna: geo.comuna,
+      neighbourhood: geo.neighbourhood,
+      street: geo.street,
+      house_number: geo.house_number,
+    });
+
+    if (error) {
+      setError(error.message);
+    } else if (incidentData) {
+      setSuccess(true);
+      setTimeout(() => navigate('/'), 2000);
+    }
+
+    setLoading(false);
+  };
+
+  if (success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Card className="max-w-sm text-center p-8">
+          <div className="mx-auto h-16 w-16 rounded-full bg-secondary-fixed-dim/40 flex items-center justify-center">
+            <Icon name="share" size={30} className="text-on-surface" />
+          </div>
+          <h2 className="mt-4 text-headline-md font-bold text-on-surface">Reporte creado exitosamente</h2>
+          <p className="mt-2 text-body-md text-on-surface-variant">Tu reporte ha sido registrado y será revisado por la comunidad.</p>
+        </Card>
+      </div>
+    );
+  }
+
+  const locationSection = (
+    <div className="space-y-4">
+      <h3 className="text-label-md font-semibold text-on-surface">¿Dónde ocurrió la incidencia? *</h3>
+
+      {locationMethod === 'none' && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={handleUseGpsLocation}
+            disabled={gpsLoading}
+            className="p-4 border-2 border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors flex flex-col items-center gap-2 disabled:opacity-50"
+          >
+            <Icon name="locate" className="text-primary" size={28} />
+            <span className="text-label-md font-semibold text-on-surface">En mi ubicación</span>
+            <span className="text-label-sm text-on-surface-variant text-center">Usar GPS del dispositivo</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleUseMapSelection}
+            className="p-4 border-2 border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors flex flex-col items-center gap-2"
+          >
+            <Icon name="map" className="text-on-surface-variant" size={28} />
+            <span className="text-label-md font-semibold text-on-surface">En el mapa</span>
+            <span className="text-label-sm text-on-surface-variant text-center">Seleccionar punto en el mapa</span>
+          </button>
+        </div>
+      )}
+
+      {locationMethod === 'gps' && (
+        <div>
+          {gpsError && <Alert tone="error" className="mb-3">{gpsError}</Alert>}
+          <Button type="button" variant="outline" onClick={handleUseGpsLocation} disabled={gpsLoading} fullWidth className="mb-3">
+            <Icon name="locate" size={18} /> {gpsLoading ? 'Obteniendo ubicación...' : 'Usar mi ubicación actual'}
+          </Button>
+          {latitude && longitude && (
+            <div className="bg-surface-container rounded-lg p-3">
+              <p className="text-label-md font-semibold text-on-surface">Punto seleccionado</p>
+              <p className="text-label-sm text-on-surface-variant">{latitude.toFixed(5)}, {longitude.toFixed(5)}</p>
+            </div>
+          )}
+          <button type="button" onClick={() => setLocationMethod('none')} className="mt-2 text-label-sm text-on-surface-variant hover:text-on-surface">
+            ← Cambiar método
+          </button>
+        </div>
+      )}
+
+      {locationMethod === 'map' && !isMapFullscreen && (
+        <div>
+          <p className="text-label-sm text-on-surface-variant mb-2">Toca el mapa para seleccionar la ubicación exacta</p>
+          {latitude && longitude && (
+            <div className="bg-surface-container rounded-lg p-3">
+              <p className="text-label-md font-semibold text-on-surface">Punto seleccionado</p>
+              <p className="text-label-sm text-on-surface-variant">{latitude.toFixed(5)}, {longitude.toFixed(5)}</p>
+            </div>
+          )}
+          <button type="button" onClick={() => setLocationMethod('none')} className="mt-2 text-label-sm text-on-surface-variant hover:text-on-surface">
+            ← Cambiar método
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
+  const mapSection = (
+    <div className="space-y-4">
+      <h3 className="text-label-md font-semibold text-on-surface">Ubicación exacta</h3>
+      <PlaceSearchInput
+        label="Buscar dirección o lugar"
+        placeholder="Escribe una dirección para ubicar el punto"
+        onSelect={handlePlaceSelect}
+      />
+      <div className="h-64 lg:h-80 rounded-lg overflow-hidden border border-outline-variant">
+        <MapView
+          center={mapCenter}
+          zoom={15}
+          focus={searchFocus}
+          onLocationSelect={handleLocationSelect}
+          selectedLocation={latitude && longitude ? [latitude, longitude] : null}
+          interactive
+          showLocationControls={false}
+        />
+      </div>
+
+      <div>
+        <h3 className="text-label-md font-semibold text-on-surface mb-3">Evidencia fotográfica</h3>
+
+        <div className="mb-3 rounded-lg border border-secondary-container bg-secondary-container/10 p-3 flex gap-2">
+          <Icon name="camera" className="text-secondary shrink-0 mt-0.5" size={18} />
+          <p className="text-label-sm text-on-surface">
+            Las fotos que subas podrán ser <strong>visibles de forma anónima</strong> para otros usuarios y
+            <strong> vendidas a terceros</strong> como parte del dato. Al subirla cedes los derechos descritos en los
+            <Link to="/terms" className="text-primary font-semibold hover:underline"> Términos y Condiciones</Link>.
+          </p>
+        </div>
+
+        <EvidenceUploader image={image} error={imageError} onChange={handleImageChange} onClear={() => { setImage(null); setImageError(''); }} />
+      </div>
+    </div>
+  );
+
+  return (
+    <TermsGate profile={profile} requirePhoto onAccepted={onConsentAccepted} title="Debes aceptar las condiciones para reportar">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+      {isMapFullscreen && (
+        <div className="fixed inset-0 z-[5000] lg:hidden">
+          <div className="absolute inset-0">
+            <MapView
+              center={mapCenter}
+              zoom={15}
+              focus={searchFocus}
+              onLocationSelect={handleLocationSelect}
+              selectedLocation={latitude && longitude ? [latitude, longitude] : null}
+              interactive
+              showLocationControls={false}
+            />
+          </div>
+          <div className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/60 to-transparent z-10">
+            <div className="flex items-center justify-between">
+              <p className="text-white font-medium text-sm">Selecciona la ubicación en el mapa</p>
+              <button type="button" onClick={() => setIsMapFullscreen(false)} className="bg-white/20 backdrop-blur-sm text-white p-2 rounded-full hover:bg-white/30 transition">
+                <Icon name="close" />
+              </button>
+            </div>
+          </div>
+          {latitude && longitude && (
+            <div className="absolute bottom-4 left-4 right-4 lg:hidden z-10">
+              <div className="bg-surface-container-lowest rounded-lg shadow-elevation-soft p-3">
+                <p className="text-label-md font-semibold text-on-surface">Punto seleccionado</p>
+                <p className="text-label-sm text-on-surface-variant mt-1">{latitude.toFixed(5)}, {longitude.toFixed(5)}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="w-full lg:w-1/2 p-4 md:p-6 pb-24 lg:pb-6 overflow-y-auto">
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <h2 className="text-headline-md md:text-headline-lg font-bold text-on-surface">Nuevo reporte</h2>
+          <BackButton />
+        </div>
+        {error && <Alert tone="error" className="mb-4">{error}</Alert>}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {locationSection}
+
+          {nearbyLoading && (
+            <div className="flex items-center gap-2 text-label-sm text-on-surface-variant">
+              <span className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></span>
+              Buscando reportes cercanos...
+            </div>
+          )}
+
+          {!nearbyLoading && !nearbyDismissed && nearbyIncidents.length > 0 && (
+            <div className="rounded-xl border border-secondary-container bg-secondary-container/20 p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Icon name="alert" size={18} className="text-secondary" />
+                <h3 className="font-semibold text-on-surface">Esto ya fue reportado cerca</h3>
+              </div>
+              <p className="text-label-sm text-on-surface-variant">
+                En un radio de 100 m ya existe {nearbyIncidents.length === 1 ? 'un reporte' : `${nearbyIncidents.length} reportes`} de esta categoría.
+                Confirma el existente en lugar de crear un duplicado.
+              </p>
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {nearbyIncidents.map(n => (
+                  <div key={n.id} className="rounded-lg bg-surface-container-lowest border border-outline-variant p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-label-md font-semibold text-on-surface truncate">
+                          {INCIDENT_CATEGORIES.find(c => c.value === n.category)?.label || n.category}
+                        </p>
+                        {n.place_name && <p className="text-label-sm text-on-surface-variant truncate">{n.place_name}</p>}
+                        <p className="text-label-sm text-on-surface-variant">
+                          👍 {n.votes_up} · {Math.round(n.distance_m)} m · {n.description.substring(0, 60)}...
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleConfirmNearby(n)}
+                        className="shrink-0 px-3 py-1.5 rounded-lg bg-secondary text-white text-label-sm font-semibold hover:opacity-90 transition"
+                      >
+                        Confirmar
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => { setNearbyDismissed(true); setNearbyIncidents([]); }}
+                className="text-label-sm text-on-surface-variant hover:text-on-surface underline"
+              >
+                Crear de todos modos
+              </button>
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <Select
+              label="Categoría *"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              required
+            >
+              <option value="">Selecciona una categoría</option>
+              {INCIDENT_CATEGORIES.map(cat => (
+                <option key={cat.value} value={cat.value}>{cat.label}</option>
+              ))}
+            </Select>
+
+            <div>
+              <Textarea
+                label="Descripción *"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={4}
+                placeholder="Describe la incidencia con detalle..."
+                hint={`${description.length}/${DESCRIPTION_MAX_LENGTH} caracteres`}
+                required
+              />
+              <p className="mt-4 text-label-md font-semibold text-on-surface">Severidad *</p>
+              <div className="mt-2">
+                <SeveritySelector value={severity} onChange={setSeverity} />
+              </div>
+            </div>
+
+            <Input
+              label="Fecha de observación *"
+              type="date"
+              value={observedAt}
+              onChange={(e) => setObservedAt(e.target.value)}
+              max={new Date().toISOString().split('T')[0]}
+              required
+            />
+
+            <Select
+              label="Duración estimada *"
+              value={estimatedDuration}
+              onChange={(e) => setEstimatedDuration(e.target.value)}
+              required
+            >
+              <option value="">Selecciona una opción</option>
+              {DURATION_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </Select>
+          </div>
+
+          <div className="lg:hidden">{mapSection}</div>
+
+          <Button
+            type="submit"
+            size="lg"
+            fullWidth
+            loading={loading}
+            disabled={!category || !description || severity === null || !observedAt || !estimatedDuration || !latitude || !longitude}
+            className="mt-2"
+          >
+            <Icon name="report" size={18} /> Enviar reporte
+          </Button>
+        </form>
+      </div>
+
+      <div className="hidden lg:block w-1/2 p-6 overflow-y-auto border-l border-outline-variant">
+        {mapSection}
+      </div>
+      </div>
+    </TermsGate>
+  );
+}
+
+export default ReportPage;
