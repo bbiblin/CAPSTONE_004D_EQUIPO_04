@@ -12,7 +12,7 @@ function MobileHeader({ profile }: MobileHeaderProps) {
         <Icon name="map" />
       </button>
       <Link to="/" className="flex items-center gap-2">
-        <img src="/icon-192.png" alt="Movimap" className="w-8 h-8 rounded-lg object-cover" />
+        <img src="/icon-192-v2.png" alt="Movimap" className="w-8 h-8 rounded-lg object-cover" />
         <span className="font-bold text-on-surface text-body-lg">Movimap</span>
       </Link>
       <div className="w-9 h-9 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center text-sm font-bold">

@@ -68,7 +68,7 @@ function RegisterPage() {
       <BackButton className="absolute top-4 left-4" />
       <Card className="w-full max-w-sm p-8">
         <div className="flex flex-col items-center mb-6">
-          <img src="/icon-192.png" alt="Movimap" className="w-14 h-14 rounded-xl object-cover" />
+          <img src="/icon-192-v2.png" alt="Movimap" className="w-14 h-14 rounded-xl object-cover" />
           <h1 className="mt-3 text-headline-md font-bold text-on-surface">Movimap</h1>
           <p className="text-body-md text-on-surface-variant">Crea tu cuenta para participar</p>
         </div>

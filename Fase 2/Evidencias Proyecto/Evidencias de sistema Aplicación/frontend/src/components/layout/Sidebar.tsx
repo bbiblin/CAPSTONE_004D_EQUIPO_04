@@ -21,7 +21,7 @@ function Sidebar({ profile, onLogout }: SidebarProps) {
   return (
     <aside className="hidden md:flex flex-col w-64 shrink-0 bg-surface-container border-r border-outline-variant">
       <div className="flex flex-col items-center py-8">
-        <img src="/icon-192.png" alt="Movimap" className="w-16 h-16 rounded-xl object-cover" />
+        <img src="/icon-192-v2.png" alt="Movimap" className="w-16 h-16 rounded-xl object-cover" />
         <h1 className="mt-3 text-headline-md font-bold text-on-surface">Movimap</h1>
         <p className="text-label-sm text-on-surface-variant mt-1">Accesibilidad urbana</p>
       </div>

@@ -1,12 +1,12 @@
-const CACHE_NAME = 'movimap-v2';
+const CACHE_NAME = 'movimap-v3';
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/favicon.png',
-  '/icon-192.png',
-  '/icon-512.png',
-  '/icon-512-maskable.png',
+  '/favicon-v2.png',
+  '/icon-192-v2.png',
+  '/icon-512-v2.png',
+  '/icon-512-maskable-v2.png',
 ];
 
 self.addEventListener('install', (event) => {
