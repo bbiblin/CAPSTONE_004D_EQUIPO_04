@@ -2,7 +2,7 @@
 
 Plataforma web de **reportes ciudadanos de incidencias de accesibilidad urbana** (veredas en mal estado, rampas, iluminación, ascensores, etc.), con validación comunitaria y explotación de los datos como producto de Business Intelligence.
 
-🔗 **Aplicación desplegada:** https://movimap-duoc.netlify.app/
+🔗 **Aplicación desplegada:** https://movimap-sprints.onrender.com/
 
 ---
 
