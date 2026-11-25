@@ -38,12 +38,30 @@ temp/
 *.map
 *.spec.ts
 *.test.ts
+!frontend/**/*.test.ts
 *.e2e.ts
 *.stories.tsx
 *.stories.ts
 *.mdx
 *.md
+!docs/*.md
 .DS_Store
 Thumbs.db
 *.code-profiles
 .private
+backup-originales/
+
+# Excepciones del plan de pruebas extendido (tests E2E y docs de pruebas)
+!docs/**/*.md
+!testing/**/*.md
+!frontend/e2e/
+!frontend/e2e/**
+!**/e2e/*.spec.ts
+
+# Binario de k6 (descargar en cada máquina: winget install grafana.k6 o
+# https://grafana.com/docs/k6/latest/installation/) - no versionar 68 MB
+testing/performance/k6-*/
+
+# Artefactos de ejecución de Playwright (traces/screenshots/.last-run)
+frontend/test-results/
+docs/evidencias/integracion/test-results/
