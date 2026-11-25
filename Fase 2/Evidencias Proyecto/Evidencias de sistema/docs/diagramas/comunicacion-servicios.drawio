@@ -1,0 +1,111 @@
+<mxfile host="app.diagrams.net" agent="opencode" version="24.4.0">
+  <diagram id="comunicacion-servicios" name="Comunicación entre servicios">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ============ ACTORES ============ -->
+        <mxCell id="a_ciudadano" value="Usuario / Ciudadano" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontColor=#1a1a1a;" vertex="1" parent="1">
+          <mxGeometry x="20" y="170" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a_admin" value="Admin / Moderador" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontColor=#1a1a1a;" vertex="1" parent="1">
+          <mxGeometry x="20" y="270" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ============ FRONTEND ============ -->
+        <mxCell id="spa" value="SPA Movimap&#10;React / Vite&#10;Mapa Leaflet · moderación local" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontColor=#1a1a1a;" vertex="1" parent="1">
+          <mxGeometry x="220" y="120" width="200" height="220" as="geometry" />
+        </mxCell>
+
+        <!-- ============ EXTERNO (geocoding) ============ -->
+        <mxCell id="nominatim" value="Nominatim / OpenStreetMap" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontColor=#1a1a1a;" vertex="1" parent="1">
+          <mxGeometry x="220" y="20" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ============ BOUNDARY SUPABASE ============ -->
+        <mxCell id="supabase_grp" value="Supabase" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#666666;dashed=1;verticalAlign=top;fontStyle=1;fontSize=16;fontColor=#444444;" vertex="1" parent="1">
+          <mxGeometry x="480" y="40" width="780" height="460" as="geometry" />
+        </mxCell>
+
+        <mxCell id="auth" value="Auth&#10;(GoTrue)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontColor=#1a1a1a;" vertex="1" parent="1">
+          <mxGeometry x="520" y="80" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="postgrest" value="PostgREST&#10;(Data API / RPCs)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontColor=#1a1a1a;" vertex="1" parent="1">
+          <mxGeometry x="520" y="170" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="realtime" value="Realtime&#10;(WebSocket)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontColor=#1a1a1a;" vertex="1" parent="1">
+          <mxGeometry x="520" y="260" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="storage" value="Storage&#10;(incident-photos)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontColor=#1a1a1a;" vertex="1" parent="1">
+          <mxGeometry x="520" y="350" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="postgres" value="PostgreSQL&#10;tablas base + vistas&#10;(incidents_public / _with_stats)&#10;· RLS" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;fontColor=#1a1a1a;" vertex="1" parent="1">
+          <mxGeometry x="740" y="240" width="290" height="200" as="geometry" />
+        </mxCell>
+
+        <!-- ============ CONSUMIDOR ============ -->
+        <mxCell id="analista" value="Analista BI&#10;(paneles propios)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontColor=#1a1a1a;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="170" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ============ EDGES ============ -->
+        <mxCell id="e1" value="Consulta, reporta, vota" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;fontColor=#333333;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="a_ciudadano" target="spa">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="0" y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" value="Modera y gestiona" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;fontColor=#333333;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="a_admin" target="spa">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="0" y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" value="HTTPS/JSON (login, sesión)" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;fontColor=#333333;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="spa" target="auth">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="0" y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" value="HTTPS/JSON (CRUD + RPCs)" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;fontColor=#333333;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="spa" target="postgrest">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="0" y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e5" value="WebSocket (push, sin polling)" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;fontColor=#333333;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="spa" target="realtime">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="0" y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e6" value="HTTPS (upload foto)" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;fontColor=#333333;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="spa" target="storage">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="0" y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e7" value="HTTPS/REST (geocoding)" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;fontColor=#333333;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="spa" target="nominatim">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="0" y="-14" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e8" value="SQL + RLS" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;fontColor=#333333;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="postgrest" target="postgres">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="0" y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e9" value="evento (WAL / CDC)" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;fontColor=#333333;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="postgres" target="realtime">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="0" y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e10" value="CSV (paneles propios)" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=11;fontColor=#333333;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="postgrest" target="analista">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="0" y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ============ LEYENDA ============ -->
+        <mxCell id="legend" value="Leyenda · azul = usuarios · verde = frontend · amarillo = servicios Supabase · naranja = base de datos · rosa = externos" style="text;html=1;align=left;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="20" y="560" width="760" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

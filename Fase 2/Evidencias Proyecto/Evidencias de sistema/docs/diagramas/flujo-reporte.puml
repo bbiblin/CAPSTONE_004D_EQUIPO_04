@@ -1,0 +1,47 @@
+@startuml
+' Movimap — Flujo del reporte de incidencia (C4 Nivel 1).
+' Muestra el proceso de reporte y las herramientas que interactúan (no las
+' acciones de roles). Etiquetas en español; tecnologías en inglés.
+' Importar en Drawio: Extras -> Insertar -> Avanzado -> PlantUML.
+!include <C4/C4_Container>
+
+title Movimap — Flujo del reporte de incidencia
+
+' ---------- Personas ----------
+Person(ciudadano, "Ciudadano", "Inicia y registra el reporte")
+
+' ---------- Contenedores del sistema ----------
+Container_Boundary(movimap, "Movimap") {
+    Container(web, "Interfaz Web", "React + TypeScript + Vite",
+        "Formulario y validación (zod); moderación local de imagen (nsfwjs / TensorFlow.js) y texto (bad-words)")
+    Container(storage, "Almacenamiento de evidencia", "Supabase Storage",
+        "Bucket público incident-photos con la evidencia fotográfica")
+    Container(api, "API de Datos", "PostgREST",
+        "Consulta duplicados cercanos y persistencia del reporte")
+    ContainerDb(db, "Base de Datos", "PostgreSQL",
+        "Tabla incidents (visibilidad derivada), RLS y triggers")
+}
+
+' ---------- Soluciones externas ----------
+Container_Ext(geo, "Geocodificación", "Nominatim / OpenStreetMap",
+    "Geocodifica dirección y reverse-geocoding de la ubicación")
+
+' ---------- Flujo del reporte (orden del proceso) ----------
+Rel(ciudadano, web, "Envía incidencia (categoría, descripción, severidad, fecha, duración, ubicación y foto)")
+Rel(web, geo, "Geocodifica dirección / reverse-geocoding", "HTTPS")
+Rel(web, storage, "Sube evidencia fotográfica", "HTTPS")
+Rel(web, api, "Consulta duplicados cercanos y guarda reporte", "HTTPS / JSON")
+Rel(api, db, "INSERT con RLS y trigger (visibilidad inicial activa)", "SQL")
+Rel(db, api, "Devuelve registro confirmado", "SQL")
+Rel(api, web, "Confirma registro", "HTTPS / JSON")
+Rel(web, ciudadano, "Muestra confirmación del reporte")
+
+' ---------- Leyenda (español) ----------
+legend right
+|<color:#08427B> **Persona** </color> |
+|<color:#44158B> **Contenedor** </color> |
+| <color:#44483B> **Contenedor externo** </color> |
+|<color:#116D3D> **Base de datos** </color> |
+endlegend
+
+@enduml

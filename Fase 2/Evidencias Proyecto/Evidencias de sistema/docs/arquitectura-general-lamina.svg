@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="720" fill="#f8fafc"/>
+
+  <!-- Título -->
+  <text x="640" y="52" text-anchor="middle" font-size="30" font-weight="bold" fill="#0f172a">Movimap — Arquitectura general</text>
+  <text x="640" y="84" text-anchor="middle" font-size="16" fill="#475569">Reportes de accesibilidad urbana → producto de datos para la toma de decisiones</text>
+
+  <!-- ==================== COLUMNA DE BLOQUES ==================== -->
+  <!-- Col 1: Usuarios -->
+  <g filter="url(#sh)">
+    <rect x="60" y="140" width="190" height="300" rx="14" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+  </g>
+  <circle cx="85" cy="165" r="15" fill="#64748b"/>
+  <text x="85" y="170" text-anchor="middle" font-size="15" fill="#ffffff">👥</text>
+  <text x="112" y="171" font-size="17" font-weight="bold" fill="#334155">Usuarios</text>
+
+  <text x="80" y="210" font-size="15" fill="#1e293b">Ciudadanos</text>
+  <text x="80" y="260" font-size="15" fill="#1e293b">Administradores</text>
+  <text x="80" y="310" font-size="15" fill="#1e293b">Clientes / Analistas</text>
+  <text x="80" y="360" font-size="13" fill="#64748b">Web (navegador)</text>
+  <text x="80" y="405" font-size="13" fill="#64748b">Sin registro pueden ver el mapa</text>
+
+  <!-- Flecha col1 -> col2 -->
+  <g stroke="#94a3b8" stroke-width="2.5" fill="none">
+    <line x1="250" y1="290" x2="292" y2="290"/>
+    <path d="M284 283 L293 290 L284 297" fill="none" stroke="#94a3b8" stroke-width="2.5"/>
+  </g>
+
+  <!-- Col 2: Frontend -->
+  <g filter="url(#sh)">
+    <rect x="300" y="140" width="200" height="300" rx="14" fill="#ffffff" stroke="#0ea5e9" stroke-width="1.5"/>
+  </g>
+  <!-- logo React -->
+  <g transform="translate(322,150)">
+    <circle r="15" fill="#e0f2fe"/>
+    <ellipse cx="0" cy="0" rx="13" ry="5" fill="none" stroke="#0284c7" stroke-width="1.6"/>
+    <ellipse cx="0" cy="0" rx="13" ry="5" fill="none" stroke="#0284c7" stroke-width="1.6" transform="rotate(60)"/>
+    <ellipse cx="0" cy="0" rx="13" ry="5" fill="none" stroke="#0284c7" stroke-width="1.6" transform="rotate(120)"/>
+    <circle r="2.5" fill="#0284c7"/>
+  </g>
+  <text x="352" y="157" font-size="16" font-weight="bold" fill="#0f172a">Frontend</text>
+  <text x="352" y="176" font-size="12" fill="#475569">React + TypeScript (Vite)</text>
+
+  <text x="320" y="215" font-size="14" fill="#1e293b">Mapa interactivo</text>
+  <text x="334" y="233" font-size="12" fill="#64748b">clustering + heatmap</text>
+  <text x="320" y="263" font-size="14" fill="#1e293b">Formulario de reporte</text>
+  <text x="320" y="300" font-size="14" fill="#1e293b">Moderación de contenido</text>
+  <text x="334" y="318" font-size="12" fill="#64748b">en el navegador: NSFW + textos</text>
+  <text x="320" y="352" font-size="14" fill="#1e293b">Cuenta / sesión</text>
+  <text x="320" y="395" font-size="14" fill="#1e293b">Panel administrador</text>
+
+  <!-- Flecha col2 -> col3 -->
+  <g stroke="#94a3b8" stroke-width="2.5" fill="none">
+    <line x1="500" y1="290" x2="542" y2="290"/>
+    <path d="M534 283 L543 290 L534 297" fill="none" stroke="#94a3b8" stroke-width="2.5"/>
+  </g>
+
+  <!-- Col 3: Supabase -->
+  <g filter="url(#sh)">
+    <rect x="550" y="140" width="300" height="300" rx="14" fill="#ffffff" stroke="#3ecf8e" stroke-width="1.5"/>
+  </g>
+  <!-- logo supabase (rayo) -->
+  <g transform="translate(572,150)">
+    <circle r="15" fill="#dcfce7"/>
+    <path d="M4 -8 L-5 3 L-1 3 L-4 8 L6 -3 L1 -3 Z" fill="#16a34a"/>
+  </g>
+  <text x="602" y="157" font-size="16" font-weight="bold" fill="#0f172a">Supabase</text>
+  <text x="602" y="176" font-size="12" fill="#475569">plataforma backend (nube)</text>
+
+  <!-- submodulos -->
+  <g>
+    <rect x="572" y="200" width="256" height="52" rx="10" fill="#f1f5f9" stroke="#e2e8f0"/>
+    <circle cx="592" cy="226" r="12" fill="#8b5cf6"/>
+    <text x="592" y="231" text-anchor="middle" font-size="12" fill="#fff">🔐</text>
+    <text x="612" y="221" font-size="14" font-weight="bold" fill="#1e293b">Auth</text>
+    <text x="612" y="239" font-size="12" fill="#64748b">identidad y roles</text>
+  </g>
+  <g>
+    <rect x="572" y="258" width="256" height="52" rx="10" fill="#f1f5f9" stroke="#e2e8f0"/>
+    <circle cx="592" cy="284" r="12" fill="#336791"/>
+    <ellipse cx="592" cy="278" rx="9" ry="3.5" fill="#fff"/>
+    <path d="M583 278 V290 M601 278 V290" stroke="#fff" stroke-width="2"/>
+    <text x="612" y="279" font-size="14" font-weight="bold" fill="#1e293b">PostgreSQL</text>
+    <text x="612" y="297" font-size="12" fill="#64748b">datos + seguridad por fila (RLS)</text>
+  </g>
+  <g>
+    <rect x="572" y="316" width="256" height="52" rx="10" fill="#f1f5f9" stroke="#e2e8f0"/>
+    <circle cx="592" cy="342" r="12" fill="#10b981"/>
+    <path d="M585 344 h14 M592 337 l-2 3 h4 l-2 3" stroke="#fff" stroke-width="2" fill="none"/>
+    <text x="612" y="337" font-size="14" font-weight="bold" fill="#1e293b">Storage</text>
+    <text x="612" y="355" font-size="12" fill="#64748b">fotos de evidencia</text>
+  </g>
+  <g>
+    <rect x="572" y="374" width="256" height="52" rx="10" fill="#f1f5f9" stroke="#e2e8f0"/>
+    <circle cx="592" cy="400" r="12" fill="#f43f5e"/>
+    <path d="M586 404 l3-6 h-2 l3-6" stroke="#fff" stroke-width="2" fill="none"/>
+    <text x="612" y="395" font-size="14" font-weight="bold" fill="#1e293b">Realtime</text>
+    <text x="612" y="413" font-size="12" fill="#64748b">push en vivo (WebSocket)</text>
+  </g>
+
+  <!-- Flecha col3 -> col4 -->
+  <g stroke="#94a3b8" stroke-width="2.5" fill="none">
+    <line x1="850" y1="290" x2="892" y2="290"/>
+    <path d="M884 283 L893 290 L884 297" fill="none" stroke="#94a3b8" stroke-width="2.5"/>
+  </g>
+
+  <!-- Col 4: BI -->
+  <g filter="url(#sh)">
+    <rect x="900" y="140" width="220" height="300" rx="14" fill="#ffffff" stroke="#eab308" stroke-width="1.5"/>
+  </g>
+  <!-- logo PowerBI (3 barras) -->
+  <g transform="translate(922,150)">
+    <circle r="15" fill="#fef9c3"/>
+    <rect x="-7" y="2" width="4" height="8" rx="1" fill="#ca8a04"/>
+    <rect x="-2" y="-2" width="4" height="12" rx="1" fill="#ca8a04"/>
+    <rect x="3" y="-6" width="4" height="16" rx="1" fill="#ca8a04"/>
+  </g>
+  <text x="952" y="157" font-size="16" font-weight="bold" fill="#0f172a">Analítica BI</text>
+  <text x="952" y="176" font-size="12" fill="#475569">Power BI / CSV</text>
+
+  <text x="924" y="225" font-size="15" font-weight="bold" fill="#1e293b">Producto de datos</text>
+  <text x="924" y="260" font-size="14" fill="#1e293b">Tableros y KPIs</text>
+  <text x="924" y="290" font-size="14" fill="#1e293b">Mapas de reportes</text>
+  <text x="924" y="330" font-size="13" fill="#64748b">Rol solo-lectura</text>
+  <text x="924" y="348" font-size="12" fill="#64748b">bi_reader (direct query)</text>
+  <text x="924" y="392" font-size="12" fill="#64748b">Dato actualizado en vivo</text>
+
+  <!-- ==================== SERVICIOS EXTERNOS ==================== -->
+  <g filter="url(#sh)">
+    <rect x="300" y="500" width="820" height="130" rx="14" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+  </g>
+  <text x="330" y="538" font-size="16" font-weight="bold" fill="#334155">Servicios externos</text>
+
+  <g>
+    <rect x="330" y="556" width="360" height="54" rx="10" fill="#f1f5f9" stroke="#e2e8f0"/>
+    <circle cx="354" cy="582" r="12" fill="#0ea5e9"/>
+    <text x="354" y="587" text-anchor="middle" font-size="12" fill="#fff">📍</text>
+    <text x="376" y="577" font-size="14" font-weight="bold" fill="#1e293b">Nominatim</text>
+    <text x="376" y="596" font-size="12" fill="#64748b">geocodificación de direcciones</text>
+  </g>
+
+  <g>
+    <rect x="730" y="556" width="370" height="54" rx="10" fill="#f1f5f9" stroke="#e2e8f0"/>
+    <circle cx="754" cy="582" r="12" fill="#7c3aed"/>
+    <text x="754" y="587" text-anchor="middle" font-size="12" fill="#fff">🛡️</text>
+    <text x="776" y="577" font-size="14" font-weight="bold" fill="#1e293b">Moderación de contenido</text>
+    <text x="776" y="596" font-size="12" fill="#64748b">NSFW + textos ofensivos (en el navegador)</text>
+  </g>
+
+  <!-- conectores de servicios externos -->
+  <g stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4 4" fill="none">
+    <line x1="510" y1="500" x2="480" y2="440"/>
+    <line x1="900" y1="500" x2="880" y2="440"/>
+  </g>
+
+  <!-- flecha superior usuarios -> texto de flujo -->
+  <text x="640" y="668" text-anchor="middle" font-size="15" fill="#475569">La comunidad reporta → Movimap organiza → los clientes consumen el dato</text>
+</svg>

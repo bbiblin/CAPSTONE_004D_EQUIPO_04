@@ -1,0 +1,373 @@
+/* Leaflet styles */
+@import 'leaflet/dist/leaflet.css';
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Sistema de temas de Movimap
+   Los tokens guardan tripletes RGB (no hex) para que Tailwind
+   pueda aplicar los modificadores de opacidad (/40, /30, /10…)
+   sobre cada valor según el tema activo.
+   ============================================================ */
+:root {
+  color-scheme: light;
+
+  /* Superficies */
+  --mo-surface: 248 249 255;
+  --mo-surface-dim: 212 218 231;
+  --mo-surface-bright: 248 249 255;
+  --mo-surface-container-lowest: 255 255 255;
+  --mo-surface-container-low: 239 244 255;
+  --mo-surface-container: 231 238 251;
+  --mo-surface-container-high: 226 232 246;
+  --mo-surface-container-highest: 220 227 240;
+  --mo-surface-variant: 220 227 240;
+  --mo-background: 248 249 255;
+
+  /* Primario (verde petróleo) */
+  --mo-primary: 0 47 53;
+  --mo-primary-container: 7 71 78;
+  --mo-on-primary: 255 255 255;
+  --mo-on-primary-container: 128 180 188;
+  --mo-surface-tint: 48 102 109;
+
+  /* Secundario (rojo coral) */
+  --mo-secondary: 174 47 52;
+  --mo-secondary-container: 255 107 107;
+  --mo-on-secondary: 255 255 255;
+  --mo-on-secondary-container: 109 0 16;
+
+  /* Texto y contornos */
+  --mo-on-surface: 21 28 37;
+  --mo-on-surface-variant: 64 72 74;
+  --mo-outline: 112 121 122;
+  --mo-outline-variant: 191 200 201;
+
+  /* Error */
+  --mo-error: 186 26 26;
+  --mo-error-container: 255 218 214;
+  --mo-on-error: 255 255 255;
+  --mo-on-error-container: 147 0 10;
+
+  /* Éxito (verde) */
+  --mo-success: 20 118 74;
+  --mo-success-container: 231 245 238;
+  --mo-on-success: 255 255 255;
+  --mo-on-success-container: 20 118 74;
+
+  /* Acento teal */
+  --mo-teal: 48 102 109;
+  --mo-teal-container: 231 244 245;
+  --mo-on-teal: 255 255 255;
+  --mo-on-teal-container: 48 102 109;
+
+  /* Fijos */
+  --mo-primary-fixed: 182 236 244;
+  --mo-primary-fixed-dim: 154 207 216;
+  --mo-on-primary-fixed: 0 31 35;
+  --mo-on-primary-fixed-variant: 19 78 85;
+  --mo-secondary-fixed: 255 218 216;
+  --mo-secondary-fixed-dim: 255 179 176;
+  --mo-on-secondary-fixed: 65 0 6;
+  --mo-on-secondary-fixed-variant: 140 21 32;
+  --mo-tertiary-fixed: 232 226 212;
+  --mo-tertiary-fixed-dim: 203 198 185;
+  --mo-on-tertiary-fixed: 29 28 19;
+  --mo-on-tertiary-fixed-variant: 73 71 61;
+
+  /* Sombras */
+  --mo-shadow-color-soft: rgba(0, 47, 53, 0.06);
+  --mo-shadow-color-hover: rgba(0, 47, 53, 0.10);
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* Superficies — azul-verde profundo, nunca negro puro */
+  --mo-surface: 14 22 24;
+  --mo-surface-dim: 13 21 24;
+  --mo-surface-bright: 26 36 39;
+  --mo-surface-container-lowest: 26 36 39;
+  --mo-surface-container-low: 22 32 35;
+  --mo-surface-container: 19 28 31;
+  --mo-surface-container-high: 16 24 27;
+  --mo-surface-container-highest: 13 21 24;
+  --mo-surface-variant: 58 68 73;
+  --mo-background: 14 22 24;
+
+  /* Primario — aqua-petróleo claro (conserva la identidad teal) */
+  --mo-primary: 143 201 210;
+  --mo-primary-container: 35 76 83;
+  --mo-on-primary: 12 49 56;
+  --mo-on-primary-container: 199 235 240;
+  --mo-surface-tint: 143 201 210;
+
+  /* Secundario — coral claro */
+  --mo-secondary: 255 179 172;
+  --mo-secondary-container: 124 36 41;
+  --mo-on-secondary: 86 0 8;
+  --mo-on-secondary-container: 255 218 216;
+
+  /* Texto y contornos */
+  --mo-on-surface: 223 230 234;
+  --mo-on-surface-variant: 163 174 178;
+  --mo-outline: 139 149 154;
+  --mo-outline-variant: 58 68 73;
+
+  /* Error — salmón claro */
+  --mo-error: 255 180 171;
+  --mo-error-container: 147 0 10;
+  --mo-on-error: 105 0 5;
+  --mo-on-error-container: 255 218 214;
+
+  /* Éxito — verde claro sobre oscuro */
+  --mo-success: 127 224 167;
+  --mo-success-container: 15 42 30;
+  --mo-on-success: 15 42 30;
+  --mo-on-success-container: 127 224 167;
+
+  /* Acento teal — sobre oscuro */
+  --mo-teal: 143 209 216;
+  --mo-teal-container: 14 42 46;
+  --mo-on-teal: 14 42 46;
+  --mo-on-teal-container: 143 209 216;
+
+  /* Fijos — se mantienen (se usan a baja opacidad como tinte) */
+  --mo-primary-fixed: 182 236 244;
+  --mo-primary-fixed-dim: 154 207 216;
+  --mo-on-primary-fixed: 0 31 35;
+  --mo-on-primary-fixed-variant: 19 78 85;
+  --mo-secondary-fixed: 255 218 216;
+  --mo-secondary-fixed-dim: 255 179 176;
+  --mo-on-secondary-fixed: 65 0 6;
+  --mo-on-secondary-fixed-variant: 140 21 32;
+  --mo-tertiary-fixed: 232 226 212;
+  --mo-tertiary-fixed-dim: 203 198 185;
+  --mo-on-tertiary-fixed: 29 28 19;
+  --mo-on-tertiary-fixed-variant: 73 71 61;
+
+  /* Sombras — más sutiles sobre superficies oscuras */
+  --mo-shadow-color-soft: rgba(0, 0, 0, 0.30);
+  --mo-shadow-color-hover: rgba(0, 0, 0, 0.45);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: rgb(var(--mo-background));
+  color: rgb(var(--mo-on-surface));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100vh;
+  height: 100dvh;
+}
+
+:focus-visible {
+  outline: 2px solid #ff6b6b;
+  outline-offset: 2px;
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  overscroll-behavior: contain;
+}
+
+.dark .leaflet-container {
+  background: rgb(var(--mo-surface-container-low));
+}
+
+.leaflet-gps-controls {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1rem;
+  z-index: 1000 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.location-btn {
+  position: relative;
+  z-index: 1000 !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Main action buttons (Actualizar, Mi ubicación) y botón de seguimiento.
+   Comparten estilos; solo cambia el estado activo de seguimiento. */
+.gps-action-btn,
+.gps-follow-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  background: rgb(var(--mo-surface-container-lowest));
+  border-radius: 16px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: rgb(var(--mo-on-surface));
+  box-shadow: 0 2px 8px var(--mo-shadow-color-soft);
+  border: 1px solid rgb(var(--mo-outline-variant));
+  min-height: 48px;
+}
+
+.gps-action-btn:hover,
+.gps-follow-btn:hover {
+  background: rgb(var(--mo-surface-container-low));
+  box-shadow: 0 6px 18px var(--mo-shadow-color-hover);
+}
+
+.gps-action-btn svg,
+.gps-follow-btn svg {
+  color: rgb(var(--mo-primary));
+  flex-shrink: 0;
+}
+
+.gps-follow-active {
+  background: rgb(var(--mo-primary));
+  border-color: rgb(var(--mo-primary));
+}
+
+.gps-follow-active:hover {
+  background: rgb(var(--mo-primary-container));
+}
+
+.gps-follow-active span {
+  color: rgb(var(--mo-on-primary));
+}
+
+.gps-follow-active svg {
+  color: rgb(var(--mo-on-primary));
+}
+
+/* Status indicator */
+.gps-status-btn {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.125rem;
+  background: rgb(var(--mo-surface-container-lowest));
+  border-radius: 14px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px var(--mo-shadow-color-soft);
+  border: 1px solid rgb(var(--mo-outline-variant));
+  cursor: default;
+}
+
+.gps-status-ok {
+  color: rgb(var(--mo-success));
+}
+
+.gps-status-warning {
+  color: rgb(var(--mo-secondary));
+}
+
+.dark .gps-status-warning {
+  color: rgb(var(--mo-on-secondary-container));
+}
+
+/* Error state */
+.gps-error {
+  background: rgb(var(--mo-error-container));
+  border-color: rgb(var(--mo-secondary-fixed-dim));
+}
+
+.gps-error svg {
+  color: rgb(var(--mo-on-error-container));
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .leaflet-gps-controls {
+    top: 1rem;
+    right: 0.75rem;
+    gap: 0.625rem;
+  }
+
+  /* En mobile los botones GPS se compactan, pero se conserva un área
+     táctil mínima de 44px para no dificultar su uso en dispositivos táctiles. */
+  .gps-action-btn,
+  .gps-follow-btn {
+    padding: 0.5rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    min-height: 44px;
+    gap: 0.375rem;
+  }
+
+  .gps-action-btn svg,
+  .gps-follow-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .gps-status-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.8125rem;
+    border-radius: 12px;
+  }
+
+  .gps-status-btn .text-xl {
+    font-size: 1.25rem;
+  }
+}
+
+.leaflet-control {
+  z-index: 1000 !important;
+}
+
+.incident-popup {
+  font-size: 0.875rem;
+  font-family: Inter, sans-serif;
+}
+
+/* Popup de Leaflet adaptado al tema */
+.dark .leaflet-popup-content-wrapper,
+.dark .leaflet-popup-tip {
+  background: rgb(var(--mo-surface-container-lowest));
+  color: rgb(var(--mo-on-surface));
+  box-shadow: 0 2px 8px var(--mo-shadow-color-soft);
+}
+
+.dark .leaflet-container a {
+  color: inherit;
+}
+
+.incident-popup button {
+  cursor: pointer;
+}
+
+.incident-popup button:hover {
+  opacity: 0.9;
+}
+
+/* Smooth page transition.
+   OJO: la animación solo anima la opacidad. Si se añadiera un `transform`,
+   con `animation-fill-mode: forwards` el elemento conservaría un transform
+   (translateY(0)) que crea un bloque contenedor y rompe el `position: fixed`
+   de los paneles modales (quedan recortados por `overflow-hidden`). */
+.page-enter {
+  animation: pageIn 0.28s ease forwards;
+}
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

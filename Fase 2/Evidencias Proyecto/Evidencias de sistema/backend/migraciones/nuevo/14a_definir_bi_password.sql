@@ -1,0 +1,32 @@
+-- ============================================
+-- 14a_definir_bi_password.sql
+-- Fijar la contraseña del rol/usuarios BI (PASO PREVIO a 14 y 15)
+-- ------------------------------------------------------------
+-- Cómo usar (en el SQL Editor de Supabase, MISMA sesión):
+--
+--   1. (A) Reemplaza '<TU-CONTRASEÑA-FUERTE>' por tu contraseña real y
+--          ejecuta SOLO la línea de abajo:
+--
+--          select set_config('app.bi_password', '<TU-CONTRASEÑA-FUERTE>', false);
+--
+--      (B) O bien, si tienes la contraseña en una variable del entorno del
+--          shell, puedes evitarla fijándola directamente:
+--          (no usar VITE_*; nombre sin prefijo: SUPABASE_SERVICE_ROLE_KEY es
+--          para el script de limpieza, aquí solo el GUC.)
+--
+--   2. Ejecuta ahora este archivo (verifica que quedó fijada).
+--   3. Ejecuta `14_bi_reader_role.sql` (crea el rol bi_reader con esa password).
+--   4. (Opcional) Ejecuta `15_crear_usuarios_bi.sql` para definir 1..N usuarios
+--      de login con rol bi_reader (dashboard / Power BI).
+--
+-- Por qué así (seguridad, ISO 27001 A.10.1.2):
+--   * La contraseña NO está hardcodeada en el repo ni se commitea.
+--   * Las migraciones fallan si el GUC no está definido (no crean roles con
+--     contraseñas débiles por defecto).
+--   * El GUC es de SESIÓN (local): no se persiste en la BD ni en backups.
+-- ============================================
+
+select current_setting('app.bi_password', true) as bi_password_definida;
+
+-- Si aparece NULL / vacío, vuelve al paso 1.A y luego re-ejecuta este archivo.
+-- Una vez que muestre la contraseña, continúa con `14_bi_reader_role.sql`.

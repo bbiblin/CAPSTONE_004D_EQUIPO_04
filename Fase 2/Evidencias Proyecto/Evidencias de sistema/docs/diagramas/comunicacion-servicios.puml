@@ -1,0 +1,46 @@
+@startuml movimap_comunicacion_servicios
+' Movimap — Diagrama de comunicación entre servicios (C4 Nivel 2).
+' Complemento del c4-contenedores.puml: muestra los CANALES entre componentes.
+' Importar en Drawio: Insertar -> Avanzado -> PlantUML (queda editable como shapes).
+!include <C4/C4_Container>
+
+title Movimap — Comunicación entre servicios
+
+' ---------- Actores ----------
+Person(ciudadano, "Ciudadano", "Reporta, vota y denuncia incidencias")
+Person(admin, "Admin / Moderador", "Modera incidencias y denuncias")
+
+' ---------- Frontend ----------
+Container_Boundary(fe, "Frontend") {
+    Container(spa, "SPA Movimap", "React + TypeScript + Vite", "Mapa Leaflet, react-leaflet-cluster, heatmap; moderación local (nsfwjs, bad-words)")
+}
+
+' ---------- Supabase ----------
+Container_Boundary(supabase, "Supabase") {
+    Container(auth, "Auth", "GoTrue", "Registro, login, reset de contraseña, sesión")
+    Container(api, "PostgREST", "Data API / RPCs", "CRUD sobre tablas y vistas; RPCs get_incidents_in_bounds, get_incident_heat_cells, find_nearby_incidents, accept_terms, delete_my_account")
+    Container(rt, "Realtime", "WebSocket", "Push de INSERT/UPDATE/DELETE sobre incidents")
+    Container(storage, "Storage", "Bucket incident-photos", "Evidencia fotográfica (path opaco, sin PII)")
+    ContainerDb(db, "PostgreSQL", "Tablas base + vistas", "incidents, incident_votes, incident_reports, profiles; vistas incidents_public / incidents_with_stats; RLS")
+}
+
+' ---------- Externos ----------
+System_Ext(nominatim, "Nominatim / OpenStreetMap", "Geocoding (search) y reverse-geocoding")
+System_Ext(analista, "Analista BI", "Revisa los datos en sus propios paneles")
+
+' ---------- Relaciones (canales) ----------
+Rel(ciudadano, spa, "Reporta, vota, denuncia", "HTTPS")
+Rel(admin, spa, "Modera y gestiona", "HTTPS")
+
+Rel(spa, auth, "Login, sesión, reset password", "HTTPS / JSON")
+Rel(spa, api, "CRUD + RPCs", "HTTPS / JSON")
+Rel(spa, rt, "Push de cambios (sin polling)", "WebSocket")
+Rel(spa, storage, "Sube evidencia fotográfica", "HTTPS")
+Rel(spa, nominatim, "Geocodifica dirección / reverse", "HTTPS / REST")
+
+Rel(api, db, "SQL con RLS", "SQL")
+Rel(db, rt, "Evento de cambio (WAL / CDC)", "PostgreSQL")
+Rel(api, analista, "Exporta datos", "CSV (Accept: text/csv)")
+
+SHOW_LEGEND()
+@enduml

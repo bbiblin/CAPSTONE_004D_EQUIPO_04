@@ -1,0 +1,23 @@
+@startuml
+' Movimap — C4 Nivel 0 (Contexto) — para presentación de 3 minutos.
+' Importar/editar en Drawio via Insertar -> Avanzar -> PlantUML.
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title Movimap — Contexto (Nivel 0)
+
+Person(user, "Ciudadano", "Explora el mapa, reporta, vota y denuncia incidencias")
+Person(admin, "Admin / Moderador", "Modera incidencias y denuncias")
+Person(analyst, "Cliente BI (Analista)", "Consume el producto de datos (solo lectura)")
+
+System(movimap, "Movimap", "Plataforma de reportes de incidencias de accesibilidad urbana")
+
+System_Ext(nominatim, "Nominatim / OpenStreetMap", "Geocoding de direcciones")
+System_Ext(powerbi, "Power BI", "Herramienta de BI consumidora del producto de datos")
+
+Rel(user, movimap, "Reporta, vota y denuncia")
+Rel(admin, movimap, "Modera")
+Rel(analyst, movimap, "Consulta el dato (lectura)")
+Rel(movimap, nominatim, "Geocodifica direcciones")
+Rel(movimap, powerbi, "Entrega producto de datos")
+
+@enduml

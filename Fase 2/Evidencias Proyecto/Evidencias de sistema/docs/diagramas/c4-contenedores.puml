@@ -1,0 +1,35 @@
+@startuml movimap_c4_contenedores
+' Movimap — C4 Nivel 2 (Contenedores)
+' Importar en Draw.io: Insertar -> Avanzado -> PlantUML
+!include <C4/C4_Container>
+
+title Movimap — Diagrama de Contenedores (Nivel 2)
+
+Person(user, "Ciudadano", "Explora el mapa, reporta incidencias, vota y denuncia")
+Person(admin, "Admin / Moderador", "Revisa y modera incidencias y denuncias reportadas")
+Person(analyst, "Cliente BI (Analista)", "Toma de decisiones mediante análisis de datos agregados")
+
+System_Boundary(movimap, "Sistema Movimap") {
+    Container(webapp, "Frontend Web App", "React, TypeScript, Vite", "Interfaz responsiva con mapa Leaflet, validaciones con Zod y premoderación local (nsfwjs, bad-words)")
+    
+    ContainerDb(backend, "Backend & Base de Datos", "Supabase (PostgreSQL, PostgREST, Auth)", "Gestiona persistencia, autenticación, storage, RLS y lógica transaccional")
+    
+    ContainerDb(bi, "Capa de Datos BI", "Esquema / Vistas bi.*", "Vistas agregadas anonimizadas (sin PII), preparadas para análisis analítico")
+}
+
+System_Ext(nominatim, "Nominatim / OpenStreetMap", "Servicio externo para geocodificación de direcciones")
+System_Ext(powerbi, "Power BI", "Herramienta externa de Business Intelligence")
+
+' Relaciones de usuarios
+Rel(user, webapp, "Reporta, vota y consulta", "HTTPS")
+Rel(admin, webapp, "Modera y gestiona contenido", "HTTPS")
+Rel(analyst, powerbi, "Visualiza dashboards e informes", "HTTPS / Desktop")
+
+' Relaciones internas y servicios
+Rel(webapp, backend, "Consume API y envía transacciones", "HTTPS / JSON")
+Rel(webapp, nominatim, "Geocodifica direcciones", "HTTPS / REST")
+Rel(backend, bi, "Alimenta vistas analíticas", "Procesos internos PostgreSQL")
+Rel(powerbi, bi, "Importa o consulta datos (bi_reader)", "Conexión PostgreSQL / CSV")
+
+SHOW_LEGEND()
+@enduml
