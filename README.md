@@ -28,7 +28,7 @@ Centraliza el reporte de incidencias que hoy se realiza por vías informales (te
 | **Moderación** | `nsfwjs` + TensorFlow.js (imágenes), `bad-words` (texto) |
 | **Backend / Base de datos** | Supabase (PostgreSQL + Auth + Storage + Realtime + PostgREST) |
 | **Datos / BI** | Esquema `public` normalizado + esquema `bi` (vistas `bi.incident_daily`, `bi.incident_reports_daily`), rol de solo lectura `bi_reader` |
-| **Cloud / Despliegue** | Netlify (frontend), Supabase (backend gestionado) |
+| **Cloud / Despliegue** | Render (frontend), Supabase (backend gestionado) |
 
 ---
 
